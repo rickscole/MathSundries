@@ -16,7 +16,6 @@ class Board:
         '''
         self._boardContents = boardContents
         self._relativeBoardIndices = list(range(len(boardContents)))
-        self._relativeBoardHistory = [boardContents].copy()
         self._turn = 0
         self._containsRepeatingConfigurations = 0
     def get_board_contents(self):
@@ -44,11 +43,6 @@ class Board:
         Return the no repeating configurations flag
         '''
         return self._containsRepeatingConfigurations
-    def update_relative_board_history(self, newBoard):
-        '''
-        Update relative Board history with most recent relative board
-        '''
-        self._relativeHistory.append(newBoard)
     def update_turn(self):
         '''
         Update turn by incrementing 1
@@ -93,14 +87,6 @@ class Board:
             relativeBoardIndices[i] = index_reset
             index_reset+=1
         return relativeBoardIndices
-    def try_pop(self, list_to_check, value_to_check, list_to_pop):
-        if 0 in input_board:
-            value_to_pop = input_board.index(0)
-        if value_to_check in list_to_check:
-            list_to_pop.pop(value_to_pop)
-        else:
-            pass
-        return list_to_pop
     def assemble_subsequent_input_board(self, output_board, input_board):
         '''
         Shuffle the elements of the board of a previous redistribution to render a board properly index for the next distribution
@@ -140,8 +126,8 @@ class Board:
 ## VARIABLE INSTANTIATION
 
 
-board = Board([9, 6, 4, 2]) ## example of one that cycles immediately  
-#board = Board([14, 4, 8, 2]) ## example of one that folds
+#board = Board([9, 6, 4, 2]) ## example of one that cycles immediately  
+board = Board([14, 4, 8, 2]) ## example of one that folds
 board_contents = board.get_board_contents()
 board_length = board.get_board_length()
 relative_board_indices = board.get_relative_board_indices()
