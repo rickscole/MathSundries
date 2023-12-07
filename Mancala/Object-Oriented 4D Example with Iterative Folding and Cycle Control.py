@@ -17,6 +17,8 @@ class Board:
         self._boardContents = boardContents
         self._relativeBoardIndeces = list(range(len(boardContents)))
         self._relativeBoardHistory = [boardContents].copy()
+        self._turn = 0
+        self._noRepeatingConfigurations = 0
     def get_board_contents(self):
         '''
         Return Board contents
@@ -32,11 +34,31 @@ class Board:
         Return relative Board indeces
         '''
         return self._relativeBoardIndeces
+    def get_turn(self):
+        '''
+        Return the turn number
+        '''
+        return self._turn
+    def get_no_repeating_configurations(self):
+        '''
+        Return the no repeating configurations flag
+        '''
+        return self._noRepeatingConfigurations
     def update_relative_board_history(self, newBoard):
         '''
         Update relative Board history with most recent relative board
         '''
         self._relativeHistory.append(newBoard)
+    def update_turn(self):
+        '''
+        Update turn by incrementing 1
+        '''
+        self._turn += 1
+    def update_no_repeating_configurations(self, newValue):
+        '''
+        Update the no repeating configurations flag
+        '''
+        self._noRepeatingConfigurations = newValue
     def kenote_active_position(self, boardContents):
         '''
         Kenote, by which is meant "engage in an act of kenosis"
@@ -71,11 +93,48 @@ class Board:
             relativeBoardIndices[i] = index_reset
             index_reset+=1
         return relativeBoardIndices
+    def try_pop(self, list_to_check, value_to_check, list_to_pop):
+        if 0 in input_board:
+            value_to_pop = input_board.index(0)
+        if value_to_check in list_to_check:
+            list_to_pop.pop(value_to_pop)
+        else:
+            pass
+        return list_to_pop
     def assemble_subsequent_input_board(self, output_board, input_board):
+        '''
+        Shuffle the elements of the board of a previous redistribution to render a board properly index for the next distribution
+        Yes, the fact that our output board is essentially our input, and the input board is essentially our output, is something of a semantic souffle
+        Oh well
+        '''
         for e, i in enumerate(output_board):
             input_board[e] = output_board[relative_board_indices.index(e)]
         return(input_board)
-
+    def distribute_dimensions(self, input_board, board, output_board, relative_board_indices, input_board_list):
+        turn = board.get_turn()
+        if turn > 0:
+            output_board.pop(0)
+            input_board.pop(input_board.index(0))
+            relative_board_indices.pop(relative_board_indices.index(len(output_board)))
+        board_length = len(output_board)
+        spot_on_board_is_empty = 0
+        no_repeating_configurations = 0
+        while spot_on_board_is_empty == 0 and no_repeating_configurations == 0:
+            first_position = input_board[0]
+            gini = int((first_position - first_position % board_length) / board_length)
+            pareto = first_position % board_length
+            board.kenote_active_position(input_board)
+            output_board = board.redistribute_first_position(input_board, output_board, gini, pareto)
+            relative_board_indices = board.reset_relative_indices(first_position, board_length, relative_board_indices)
+            input_board = board.assemble_subsequent_input_board(output_board, input_board)
+            if (output_board.index(0) if 0 in output_board else -1) >= 0:
+                spot_on_board_is_empty = 1
+            if input_board in input_board_list:
+                no_repeating_configurations = 1
+            else:
+                input_board_list.append(input_board.copy())
+        board.update_turn()
+        board.update_no_repeating_configurations(no_repeating_configurations)
 
 #%%
 ## VARIABLE INSTANTIATION
@@ -89,71 +148,14 @@ relative_board_indices = board.get_relative_board_indices()
 input_board_list = [board.get_board_contents()]
 input_board = board_contents.copy()
 output_board = board_contents.copy()
+no_repeating_configurations = board.get_no_repeating_configurations()
 
 
 #%%
 ## ITERATIVE ONE-DIMENSION REDISTRIBUTION
 
 
-spot_on_board_is_empty = 0
-no_repeating_configurations = 0
-while spot_on_board_is_empty == 0 and no_repeating_configurations == 0:
-    first_position = input_board[0]
-    gini = int((first_position - first_position % board_length) / board_length)
-    pareto = first_position % board_length
-    board.kenote_active_position(input_board)
-    output_board = board.redistribute_first_position(input_board, output_board, gini, pareto)
-    relative_board_indices = board.reset_relative_indices(first_position, board_length, relative_board_indices)
-    input_board = board.assemble_subsequent_input_board(output_board, input_board)
-    if (output_board.index(0) if 0 in output_board else -1) >= 0:
-        spot_on_board_is_empty = 1
-    if input_board in input_board_list:
-        no_repeating_configurations = 1
-    else:
-        input_board_list.append(input_board.copy())
-
-
-output_board.pop(0)
-input_board.pop(input_board.index(0))
-relative_board_indices.pop(relative_board_indices.index(board_length - 1))
-board_length = board_length - 1
-spot_on_board_is_empty = 0
-no_repeating_configurations = 0
-while spot_on_board_is_empty == 0 and no_repeating_configurations == 0:
-    first_position = input_board[0]
-    gini = int((first_position - first_position % board_length) / board_length)
-    pareto = first_position % board_length
-    board.kenote_active_position(input_board)
-    output_board = board.redistribute_first_position(input_board, output_board, gini, pareto)
-    relative_board_indices = board.reset_relative_indices(first_position, board_length, relative_board_indices)
-    input_board = board.assemble_subsequent_input_board(output_board, input_board)
-    if (output_board.index(0) if 0 in output_board else -1) >= 0:
-        spot_on_board_is_empty = 1
-    if input_board in input_board_list:
-        no_repeating_configurations = 1
-    else:
-        input_board_list.append(input_board.copy())
-        
-
-output_board.pop(0)
-input_board.pop(input_board.index(0))
-relative_board_indices.pop(relative_board_indices.index(board_length - 1))
-board_length = board_length - 1
-spot_on_board_is_empty = 0
-no_repeating_configurations = 0
-while spot_on_board_is_empty == 0 and no_repeating_configurations == 0:
-    first_position = input_board[0]
-    gini = int((first_position - first_position % board_length) / board_length)
-    pareto = first_position % board_length
-    board.kenote_active_position(input_board)
-    output_board = board.redistribute_first_position(input_board, output_board, gini, pareto)
-    relative_board_indices = board.reset_relative_indices(first_position, board_length, relative_board_indices)
-    input_board = board.assemble_subsequent_input_board(output_board, input_board)
-    if (output_board.index(0) if 0 in output_board else -1) >= 0:
-        spot_on_board_is_empty = 1
-    if input_board in input_board_list:
-        no_repeating_configurations = 1
-    else:
-        input_board_list.append(input_board.copy())
-
+while no_repeating_configurations == 0:
+    board.distribute_dimensions(input_board, board, output_board, relative_board_indices, input_board_list)
+    no_repeating_configurations = board.get_no_repeating_configurations()
 
