@@ -15,10 +15,10 @@ class Board:
         Create new Board instance
         '''
         self._boardContents = boardContents
-        self._relativeBoardIndeces = list(range(len(boardContents)))
+        self._relativeBoardIndices = list(range(len(boardContents)))
         self._relativeBoardHistory = [boardContents].copy()
         self._turn = 0
-        self._noRepeatingConfigurations = 0
+        self._containsRepeatingConfigurations = 0
     def get_board_contents(self):
         '''
         Return Board contents
@@ -31,19 +31,19 @@ class Board:
         return len(self._boardContents)
     def get_relative_board_indices(self):
         '''
-        Return relative Board indeces
+        Return relative Board indices
         '''
-        return self._relativeBoardIndeces
+        return self._relativeBoardIndices
     def get_turn(self):
         '''
         Return the turn number
         '''
         return self._turn
-    def get_no_repeating_configurations(self):
+    def get_contains_repeating_configurations(self):
         '''
         Return the no repeating configurations flag
         '''
-        return self._noRepeatingConfigurations
+        return self._containsRepeatingConfigurations
     def update_relative_board_history(self, newBoard):
         '''
         Update relative Board history with most recent relative board
@@ -54,11 +54,11 @@ class Board:
         Update turn by incrementing 1
         '''
         self._turn += 1
-    def update_no_repeating_configurations(self, newValue):
+    def update_contains_repeating_configurations(self, newValue):
         '''
-        Update the no repeating configurations flag
+        Update the contains repeating configurations flag
         '''
-        self._noRepeatingConfigurations = newValue
+        self._containsRepeatingConfigurations = newValue
     def kenote_active_position(self, boardContents):
         '''
         Kenote, by which is meant "engage in an act of kenosis"
@@ -118,8 +118,8 @@ class Board:
             relative_board_indices.pop(relative_board_indices.index(len(output_board)))
         board_length = len(output_board)
         spot_on_board_is_empty = 0
-        no_repeating_configurations = 0
-        while spot_on_board_is_empty == 0 and no_repeating_configurations == 0:
+        contains_repeating_configurations = 0
+        while spot_on_board_is_empty == 0 and contains_repeating_configurations == 0:
             first_position = input_board[0]
             gini = int((first_position - first_position % board_length) / board_length)
             pareto = first_position % board_length
@@ -130,32 +130,32 @@ class Board:
             if (output_board.index(0) if 0 in output_board else -1) >= 0:
                 spot_on_board_is_empty = 1
             if input_board in input_board_list:
-                no_repeating_configurations = 1
+                contains_repeating_configurations = 1
             else:
                 input_board_list.append(input_board.copy())
         board.update_turn()
-        board.update_no_repeating_configurations(no_repeating_configurations)
+        board.update_contains_repeating_configurations(contains_repeating_configurations)
 
 #%%
 ## VARIABLE INSTANTIATION
 
 
-#board = Board([9, 6, 4, 2]) ## example of one that cycles immediately  
-board = Board([14, 4, 8, 2]) ## example of one that folds
+board = Board([9, 6, 4, 2]) ## example of one that cycles immediately  
+#board = Board([14, 4, 8, 2]) ## example of one that folds
 board_contents = board.get_board_contents()
 board_length = board.get_board_length()
 relative_board_indices = board.get_relative_board_indices()
 input_board_list = [board.get_board_contents()]
 input_board = board_contents.copy()
 output_board = board_contents.copy()
-no_repeating_configurations = board.get_no_repeating_configurations()
+contains_repeating_configurations = board.get_contains_repeating_configurations()
 
 
 #%%
 ## ITERATIVE ONE-DIMENSION REDISTRIBUTION
 
 
-while no_repeating_configurations == 0:
+while contains_repeating_configurations == 0:
     board.distribute_dimensions(input_board, board, output_board, relative_board_indices, input_board_list)
-    no_repeating_configurations = board.get_no_repeating_configurations()
+    contains_repeating_configurations = board.get_contains_repeating_configurations()
 
