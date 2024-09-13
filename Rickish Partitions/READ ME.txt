@@ -1,0 +1,3 @@
+PURPOSE:
+-- Investigate what I call Rickish Partitions.
+-- Which, as a quick explainer, are all the numbers a, b, c, d ... z that add up to N, where a, b, c, d, ... z are determined by the length of Mancala paths / cycles of N.
