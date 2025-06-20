@@ -30,8 +30,11 @@ max_board_length = 1000
 
 ## LOOP THRU VARIOUS BOARDS
 contains_repeating_configurations_list = []
+trend_counter_list = []
+contains_repeating_configurations = 0
 for bl in range(1, max_board_length + 1):
     print(bl) #time check
+    previous_contains_repeating_configurations = contains_repeating_configurations
     board = brd.Board([1] * bl) #create starting board
     board_contents = board.get_board_contents() 
     board_length = board.get_board_length()
@@ -51,11 +54,20 @@ for bl in range(1, max_board_length + 1):
         
     ## APPENDING WHETHER CONFIG LOOPS
     contains_repeating_configurations_list.append(contains_repeating_configurations)
+    
+    ## APPENDING TO TREND COUNTER
+    if bl == 1:
+        trend_counter = 1
+    elif contains_repeating_configurations == previous_contains_repeating_configurations:
+        trend_counter = trend_counter + 1
+    else:
+        trend_counter = 1
+    trend_counter_list.append(trend_counter)
 
 #%%
 
 
 ## WRITE TO CSV
 board_size = list(range(1, max_board_length + 1))
-did_config_loop_df = pd.DataFrame({ 'board_size' : board_size, 'does_congifuration_loop' : contains_repeating_configurations_list})
+did_config_loop_df = pd.DataFrame({ 'board_size' : board_size, 'does_congifuration_loop' : contains_repeating_configurations_list, 'trend': trend_counter_list})
 did_config_loop_df.to_csv(r'/Users/rcole/Desktop/imacgration/mcla/identity_board_converge_or_loop_0001_to_1000.csv', index = False)
