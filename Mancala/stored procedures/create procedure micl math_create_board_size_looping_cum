@@ -1,0 +1,18 @@
+
+create procedure micl.math_create_board_size_looping_cum as 
+
+
+-- drop table if exists
+if object_id('micl.math_board_size_looping_cum', 'U') is not null
+drop table micl.math_board_size_looping_cum; 
+
+
+-- insert into table
+select
+    b.board_size
+    , cumulative_percent_loop = cast(sum(a.does_congifuration_loop) as decimal(10,4))/ b.board_size
+into micl.math_board_size_looping_cum
+from micl.math_board_size_looping a 
+inner join micl.math_board_size_looping b on a.board_size <= b.board_size
+group by 
+    b.board_size
