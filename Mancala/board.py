@@ -114,7 +114,20 @@ class Board:
         smallest_value_index = value_list.index(smallest_value)
         optimal_exponent = min_exponent_list[smallest_value_index]
         opitmal_coefficient = coefficient_list[smallest_value_index]
-        return(smallest_value)
+        return(smallest_value) 
+    def consecutive_distributions_succeed(self, active_position, board_length):
+        number_still_an_integer = 1
+        while number_still_an_integer == 1:
+            new_number = active_position / board_length 
+            if new_number.is_integer():
+                active_position = new_number
+            else:
+                number_still_an_integer = 0
+        if active_position <= board_length:
+            bin_consecutive_distributions_succeed = 1
+        else:
+            bin_consecutive_distributions_succeed = 0
+        return(bin_consecutive_distributions_succeed)
     def kenote_active_position(self, boardContents):
         '''
         Kenote, by which is meant "engage in an act of kenosis"
@@ -211,21 +224,32 @@ class Board:
             ## ex [2, 2, 2, 2, 2]
             if first_position <= board_length: 
                 first_position = first_position
+                #print('a')
             ## active position is a power of board length --> distribute
             ## ex [125, 124, 124, 124, 124]
             elif board_length > 1 and math.log(first_position, board_length).is_integer():
                 first_position = first_position
+                #print('b')
+            ## several power downs of first position lead to small number --> distribute
+            ## ex [250, 2, 2, 2, 2]
+            elif board_length > 1 and self.consecutive_distributions_succeed(first_position, board_length) == 1:
+                first_position = first_position
+                #print('c')
             ## active position is multiple of big board, and remainder is small
             ## ex [8, 8, 7, 7]
             elif first_position % board_length == 0 and first_position / board_length <= board_length:
                 first_position = first_position
+                #print('d')
             ## slight add-on can get active position to spin once into a smaller numper
             elif (first_position + board_length - (first_position % board_length)) / board_length <= board_length:
                 first_position = (first_position + board_length - (first_position % board_length))
+                #print('e')
             elif board_length > 1:
                 first_position = self.hitch_ride(first_position, board_length) 
+                #print('f')
             else:
                 first_position = first_position
+                #print('g')
             gini = int((first_position - first_position % board_length) / board_length)
             pareto = first_position % board_length
             board.kenote_active_position(input_board)
@@ -245,3 +269,4 @@ class Board:
                 board.update_turn()
         board.update_contains_repeating_configurations(contains_repeating_configurations)
         board.update_mass(sum(input_board))
+        
